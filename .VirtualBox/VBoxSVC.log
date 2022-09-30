@@ -1,0 +1,51 @@
+00:00:00.002778 main     VirtualBox COM Server 6.1.36 r152435 win.amd64 (Jul 19 2022 21:51:27) release log
+00:00:00.002780 main     Log opened 2022-09-30T00:01:43.974449600Z
+00:00:00.002781 main     Build Type: release
+00:00:00.002785 main     OS Product: Windows 10
+00:00:00.002786 main     OS Release: 10.0.19044
+00:00:00.002787 main     OS Service Pack: 
+00:00:00.026427 main     DMI Product Name: PNVKB0A0 Samsung DeskTop
+00:00:00.039272 main     DMI Product Version: CAAAAAAA
+00:00:00.039279 main     Firmware type: UEFI
+00:00:00.039476 main     Secure Boot: VERR_PRIVILEGE_NOT_HELD
+00:00:00.039493 main     Host RAM: 16339MB (15.9GB) total, 12006MB (11.7GB) available
+00:00:00.039497 main     Executable: C:\Program Files\Oracle\VirtualBox\VBoxSVC.exe
+00:00:00.039498 main     Process ID: 7716
+00:00:00.039498 main     Package type: WINDOWS_64BITS_GENERIC
+00:00:00.054929          VirtualBox: object creation starts
+00:00:00.055154          Home directory: 'C:\Users\aaa\.VirtualBox'
+00:00:00.055232          Installed Drivers:
+00:00:00.060039            C:\WINDOWS\system32\DRIVERS\VBoxNetLwf.sys (Version: 6.1.36.2435)
+00:00:00.060688            C:\WINDOWS\system32\DRIVERS\VBoxUSBMon.sys (Version: 6.1.36.2435)
+00:00:00.061093            C:\WINDOWS\system32\DRIVERS\VBoxSup.sys (Version: 6.1.36.2435)
+00:00:00.061724            C:\WINDOWS\system32\DRIVERS\VBoxNetAdp6.sys (Version: 6.1.36.2435)
+00:00:00.065827          Loading settings file "C:\Users\aaa\.VirtualBox\VirtualBox.xml" with version "1.12-windows"
+00:00:00.066844          usbLibGetDevices: Starting USB device enumeration
+00:00:00.070459          usbLibGetDevices: Found 1 USB devices, 0 captured
+00:00:00.187003          HostDnsMonitor: initializing
+00:00:00.191867          HostDnsMonitor: updating information
+00:00:00.191893          HostDnsMonitor: old information
+00:00:00.191894            no server entries
+00:00:00.191895            no domain set
+00:00:00.191895            no search string entries
+00:00:00.191895          HostDnsMonitor: new information
+00:00:00.191896            server 1: 8.8.8.8
+00:00:00.191896            no domain set
+00:00:00.191897            no search string entries
+00:00:00.259359          VD: VDInit finished with VINF_SUCCESS
+00:00:00.260832          Loading settings file "D:\가상컴퓨터\Wind2022\Wind2022.vbox" with version "1.17-windows"
+00:00:00.263842          Loading settings file "C:\Win2016\Win2016\Win2016.vbox" with version "1.15-windows"
+00:00:00.265684          VirtualBox: object created
+00:00:02.862704          Saving settings file "C:\Users\aaa\.VirtualBox\VirtualBox.xml" with version "1.12-windows"
+00:00:02.873191          Saving settings file "C:\Users\aaa\.VirtualBox\VirtualBox.xml" with version "1.12-windows"
+00:00:03.873647          Launched VM: 69931840 pid: 15184 (0x3b50) frontend: GUI/Qt name: Win2016
+00:00:09.129140          ERROR [COM]: aRC=VBOX_E_OBJECT_NOT_FOUND (0x80bb0001) aIID={70401eef-c8e9-466b-9660-45cb3e9979e4} aComponent={ExtPackManagerWrap} aText={No extension pack by the name 'Oracle VM VirtualBox Extension Pack' was found}, preserve=false aResultDetail=0
+00:00:09.944258          Saving settings file "C:\Win2016\Win2016\Win2016.vbox" with version "1.15-windows"
+00:00:10.316321          NetworkServiceRunning: started 'VBoxNetDHCP.exe', pid 00002cb0
+00:00:13.746185          Saving settings file "C:\Win2016\Win2016\Win2016.vbox" with version "1.15-windows"
+00:00:13.758547          Saving settings file "C:\Win2016\Win2016\Win2016.vbox" with version "1.15-windows"
+00:00:14.264676          Saving settings file "C:\Win2016\Win2016\Win2016.vbox" with version "1.15-windows"
+04:15:56.312982 MainPower Host suspending: Paused 1 VMs
+04:27:45.826714 MainPower Host resumed: Resumed 1 VMs
+04:48:08.277246 MainPower Host suspending: Paused 1 VMs
+04:48:45.854820 MainPower Host resumed: Resumed 1 VMs

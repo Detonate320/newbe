@@ -1,0 +1,21 @@
+00:00:00.604551 VirtualBox GUI VM Selector Window 6.1.36 r152435 win.amd64 (Jul 19 2022 21:51:27) release log
+00:00:00.604553 Log opened 2022-09-28T00:00:25.834348300Z
+00:00:00.604554 Build Type: release
+00:00:00.604556 OS Product: Windows 10
+00:00:00.604557 OS Release: 10.0.19044
+00:00:00.604557 OS Service Pack: 
+00:00:00.618383 DMI Product Name: PNVKB0A0 Samsung DeskTop
+00:00:00.621953 DMI Product Version: CAAAAAAA
+00:00:00.621959 Firmware type: UEFI
+00:00:00.622127 Secure Boot: VERR_PRIVILEGE_NOT_HELD
+00:00:00.622142 Host RAM: 16339MB (15.9GB) total, 12041MB (11.7GB) available
+00:00:00.622146 Executable: C:\Program Files\Oracle\VirtualBox\VirtualBox.exe
+00:00:00.622146 Process ID: 7148
+00:00:00.622146 Package type: WINDOWS_64BITS_GENERIC
+00:00:00.622298 Qt version: 5.6.2
+00:00:00.683242 GUI: UIMediumEnumerator: Medium-enumeration started...
+00:00:01.113140 GUI: UIMediumEnumerator: Medium-enumeration finished!
+00:00:16.359553 GUI: UIMediumEnumerator: Medium-enumeration finished!
+00:00:16.379356 GUI: UIMediumEnumerator: Medium-enumeration finished!
+01:59:35.677705 GUI: UIMediumEnumerator: Medium-enumeration finished!
+01:59:35.677781 Log rotated - Log started 2022-09-28T00:00:25.834348300Z
