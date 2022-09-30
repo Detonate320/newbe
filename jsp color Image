@@ -1,0 +1,1094 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+    
+<%@ page import="java.io.*" %>
+<%@ page import="java.lang.*" %>  
+<%@ page import="java.util.*" %>
+<%@ page import="com.oreilly.servlet.*" %>
+<%@ page import="com.oreilly.servlet.multipart.*" %>
+<%@ page import="javax.imageio.*" %>
+<%@ page import="java.awt.image.*" %>
+
+    
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Color Image Processing - Server (RC 1)</title>
+</head>
+<body>
+<%!
+///////////////////////
+// 전역 변수부
+///////////////////////
+int[][][] inImage;
+int inH, inW;
+int[][][] outImage;
+int outH, outW;
+File inFp, outFp;
+float[] rgb = new float[3];
+float[] hsv = new float[3];
+float[] abc = new float[3];
+float[] def = new float[3];
+
+// Parameter Variable
+String algo, para1, para2;
+String inFname, outFname;
+
+///////////////////////
+// 영상처리 함수부
+///////////////////////
+public void reverseImage() {
+	// 반전 영상
+	// (중요!) 출력 영상의 크기 결정 (알고리즘에 의존)
+	outH = inH;
+	outW = inW;
+	outImage= new int[3][outH][outW];
+	/// ** Image Processing Algorithm **
+	for (int rgb=0; rgb<3; rgb++) {
+		for (int i=0; i< inH; i++) {
+			for (int k=0; k<inW; k++) {
+				outImage[rgb][i][k] = 255 - inImage[rgb][i][k];
+			}
+		}
+	}
+}
+
+public void addImage() {
+	// Add Image 영상
+	// (중요!) 출력 영상의 크기 결정 (알고리즘에 의존)
+	outH = inH;
+	outW = inW;
+	outImage= new int[3][outH][outW];
+	/// ** Image Processing Algorithm **
+	int value = Integer.parseInt(para1);
+	for (int rgb=0; rgb<3; rgb++) {
+	for (int i=0; i< inH; i++) {
+		for (int k=0; k<inW; k++) {
+			if ( inImage[rgb][i][k] + value > 255)
+				outImage[rgb][i][k] = 255;
+			else if ( inImage[rgb][i][k] + value < 0)
+				outImage[rgb][i][k] = 0;
+			else 
+				outImage[rgb][i][k] = inImage[rgb][i][k] + value ;
+		}
+	}}
+}
+
+public void BWImage127(){
+	//(3-2)black white processing(127)...
+	outH = inH;
+	outW = inW;
+	outImage = new int[3][outH][outW];
+	//**Image Processing Algorithm**
+	for(int i=0;i<inH; i++){
+		for(int k=0; k<inW;k++){
+			int sumValue = inImage[0][i][k] + inImage[1][i][k] + inImage[2][i][k]; 
+			int avgValue = sumValue/3;
+			if(avgValue < 128){
+				inImage[0][i][k] = 0;
+				inImage[1][i][k] = 0;
+				inImage[2][i][k] = 0;}
+			else{
+			inImage[0][i][k] = 255;
+			inImage[1][i][k] = 255;
+			inImage[2][i][k] = 255;
+			outImage[0][i][k] = inImage[0][i][k];
+			outImage[1][i][k] = inImage[1][i][k];
+			outImage[2][i][k] = inImage[2][i][k];}
+		}
+	}}
+
+public void GrayImage(){
+	//(3-2)black white processing(127)...
+	outH = inH;
+	outW = inW;
+	outImage = new int[3][outH][outW];
+	//**Image Processing Algorithm**
+	for(int i=0;i<inH; i++){
+		for(int k=0; k<inW;k++){
+			int sumValue = inImage[0][i][k] + inImage[1][i][k] + inImage[2][i][k]; 
+			int avgValue = sumValue/3;
+				inImage[0][i][k] = avgValue;
+				inImage[1][i][k] = avgValue;
+				inImage[2][i][k] = avgValue;
+			
+			outImage[0][i][k] = inImage[0][i][k];
+			outImage[1][i][k] = inImage[1][i][k];
+			outImage[2][i][k] = inImage[2][i][k];
+		}
+	}}
+public void paracap() {
+outH = inH;
+outW = inW;
+outImage = new int[3][outH][outW];
+//**Image Processing Algorithm**
+
+for (int rgb=0; rgb<3; rgb++) {
+for (int i=0;i<inH;i++){
+	for(int k=0;k<inW;k++){
+		outImage[rgb][i][k] =(int)(255-(255)*Math.pow((double)(inImage[rgb][i][k]/128-1),(double)2));
+	}
+} 
+}}
+
+public void paracup() {
+outH = inH;
+outW = inW;
+outImage = new int[3][outH][outW];
+//**Image Processing Algorithm**
+
+for (int rgb=0; rgb<3; rgb++) {
+for (int i=0;i<inH;i++){
+	for(int k=0;k<inW;k++){
+		outImage[rgb][i][k] =(int)(Math.pow((double)(inImage[rgb][i][k]/128-1),(double)2)*255);
+	}
+} 
+}}
+
+public void gammaImage(){
+	//감마
+	outH =inH;
+	outW =inW;
+	// 메모리 할당
+	outImage = new int[3][outH][outW];
+	/// ** Image Processing Algorithm **
+	double value = Double.parseDouble(para1);
+	
+
+	//감마 변환
+	for (int rgb=0; rgb<3; rgb++) {
+	for(int i=0; i<inH; i++){
+		for(int k=0; k<inW; k++){
+			double result=(Math.pow((double)(inImage[rgb][i][k]/255.0),(double)(value))*255+0.5);
+			if(result <0)
+				result=0;
+			else if(result >255)
+				result=255;
+			outImage[rgb][i][k] = (int)result;
+		}
+	}}
+}
+public void TBmirror(){
+outH=inH;
+outW=inW;
+outImage = new int[3][outH][outW];
+////**Image Processing Algorithm**
+for (int rgb=0; rgb<3; rgb++) {
+for (int i=0;i<inH;i++){
+	for(int k=0;k<inW;k++){
+		outImage[rgb][inH-i-1][k]=inImage[rgb][i][k];
+	}
+}}}
+public void LRmirror(){
+outH=inH;
+outW=inW;
+outImage = new int[3][outH][outW];
+////**Image Processing Algorithm**
+for (int rgb=0; rgb<3; rgb++) {
+for (int i=0;i<inH;i++){
+for(int k=0;k<inW;k++){
+	outImage[rgb][i][inW-k-1]=inImage[rgb][i][k];
+}
+}}}
+
+public void moveImage(){
+outH = inH;
+outW = inW;
+outImage = new int[3][outH][outW];
+int value = Integer.parseInt(para1);
+
+//////**Image Processing Algorithm**
+for (int rgb=0; rgb<3; rgb++) {
+for (int i=0; i<inH;i++){
+	for(int k=0; k<inW;k++){
+		if(i+value <outH && k+value <outW)
+			outImage[rgb][i+value][k+value] = inImage[rgb][i][k];
+		else break;
+			
+	}
+}}}
+
+public void zoomoutImage(){
+outH= inH;
+outW= inW;
+int value= Integer.parseInt(para1);
+outImage = new int[3][outH][outW];
+for (int rgb=0; rgb<3; rgb++) {
+for(int i=0;i<inH; i++){
+	for(int k=0;k<inW; k++){
+		outImage[rgb][i/value][k/value]=inImage[rgb][i][k];
+	}
+}}}
+
+public void zoominImage(){
+int value= Integer.parseInt(para1);
+outH=inH*value;
+outW=inW*value;
+
+outImage = new int[3][outH][outW];
+for (int rgb=0; rgb<3; rgb++) {
+for(int i=0;i<outH;i++){
+	for(int k=0;k<outW;k++){
+		outImage[rgb][i][k] = inImage[rgb][i/value][k/value];
+	}
+}}}
+
+public void rotateImage(){
+	int CenterH, CenterW, newH, newW , Val;
+	double Radian, PI;
+	// PI = 3.14159265358979;
+	PI = Math.PI;
+	int degree = Integer.parseInt(para1);
+	
+	Radian = -degree * PI / 180.0; 
+	outH = (int)(Math.floor((inW) * Math.abs(Math.sin(Radian)) + (inH) * Math.abs(Math.cos(Radian))));
+	outW = (int)(Math.floor((inW) * Math.abs(Math.cos(Radian)) + (inH) * Math.abs(Math.sin(Radian))));
+	CenterH = outH / 2;
+	CenterW = outW / 2;
+	outImage = new int[3][outH][outW];
+	
+	for (int rgb = 0; rgb < 3; rgb++) {
+		for (int i = 0; i < outH; i++) {
+			for (int k = 0; k < outW; k++) {
+				newH = (int)((i - CenterH) * Math.cos(Radian) - (k - CenterW) * Math.sin(Radian) + inH / 2);
+				newW = (int)((i - CenterH) * Math.sin(Radian) + (k - CenterW) * Math.cos(Radian) + inW / 2);
+				if (newH < 0 || newH >= inH) {
+					//Val = 255;
+					outImage[0][i][k] = 55;
+					outImage[1][i][k] = 59;
+					outImage[2][i][k] = 68;
+							
+				} else if (newW < 0 || newW >= inW) {
+					//Val = 255;
+					outImage[0][i][k] = 55;
+					outImage[1][i][k] = 59;
+					outImage[2][i][k] = 68;
+				} else {
+					Val = inImage[rgb][newH][newW];
+					outImage[rgb][i][k] = Val;
+				}
+				
+			}
+		}
+	}
+}
+
+
+
+public void embossImage(){
+	//엠보싱
+	outH = inH;
+	outW = inW;
+	outImage = new int[3][outH][outW];
+
+	double [][]mask = {
+			{-1.0,0.0,0.0},
+			{0.0,0.0,0.0},
+			{0.0,0.0,1.0}
+			};
+
+	double [][][]tmpInImage = new double[3][outH+2][outW+2];
+
+	int [][][] tmpOutImage = new int[3][outH][outW];
+
+	for(int rgb=0;rgb<3;rgb++){
+	for(int i=0;i<inH+2;i++){
+		for(int k=0;k<inW+2;k++){
+			tmpInImage[rgb][i][k]=127.0;
+		}}
+	}
+	for(int rgb=0;rgb<3;rgb++){
+	for(int i=0;i<inH;i++){
+		for(int k=0;k<inW;k++){
+			tmpInImage[rgb][i+1][k+1]=inImage[rgb][i][k];
+		}
+	}}
+
+
+	//** Image Processing Algorithm **
+	for(int rgb=0;rgb<3;rgb++){
+	for(int i=0;i<inH;i++){
+		for(int k=0;k<inW;k++){
+			double S = 0.0;
+			for(int m=0;m<3;m++)
+				for(int n=0;n<3;n++)
+					S+=tmpInImage[rgb][i+m][k+n]*mask[m][n];
+			tmpOutImage[rgb][i][k]=(int)S;
+		}
+	}}
+	//sum=1
+	for(int rgb=0;rgb<3;rgb++)
+	for(int i=0;i<outH;i++)
+		for(int k=0;k<outW;k++)
+			tmpOutImage[rgb][i][k]+=127.0;
+	for(int rgb=0;rgb<3;rgb++)
+	for(int i=0;i<outH;i++)
+		for(int k=0;k<outW;k++){
+			if(tmpOutImage[rgb][i][k]>255.0)
+				outImage[rgb][i][k]=255;
+			else if(tmpOutImage[rgb][i][k]<0.0)
+				outImage[rgb][i][k]=0;
+			else
+				outImage[rgb][i][k]=(int)tmpOutImage[rgb][i][k];
+		}
+}
+
+public void blurr(){
+	outH = inH;
+	outW = inW;
+	outImage = new int[3][outH][outW];
+
+	double [][]mask = {
+			{1.0/9,1.0/9,1.0/9},
+			{1.0/9,1.0/9,1.0/9},
+			{1.0/9,1.0/9,1.0/9}
+			};
+
+	double [][][]tmpInImage = new double[3][outH+2][outW+2];
+
+	int [][][] tmpOutImage = new int[3][outH][outW];
+
+	for(int rgb=0;rgb<3;rgb++){
+	for(int i=0;i<inH+2;i++){
+		for(int k=0;k<inW+2;k++){
+			tmpInImage[rgb][i][k]=127.0;
+		}}
+	}
+	for(int rgb=0;rgb<3;rgb++){
+	for(int i=0;i<inH;i++){
+		for(int k=0;k<inW;k++){
+			tmpInImage[rgb][i+1][k+1]=inImage[rgb][i][k];
+		}
+	}}
+
+
+	//** Image Processing Algorithm **
+	for(int rgb=0;rgb<3;rgb++){
+	for(int i=0;i<inH;i++){
+		for(int k=0;k<inW;k++){
+			double S = 0.0;
+			for(int m=0;m<3;m++)
+				for(int n=0;n<3;n++)
+					S+=tmpInImage[rgb][i+m][k+n]*mask[m][n];
+			tmpOutImage[rgb][i][k]=(int)S;
+		}
+	}}
+	//sum=1
+// 	for(int rgb=0;rgb<3;rgb++)
+// 	for(int i=0;i<outH;i++)
+// 		for(int k=0;k<outW;k++)
+// 			tmpOutImage[rgb][i][k]+=127.0;
+	for(int rgb=0;rgb<3;rgb++)
+	for(int i=0;i<outH;i++)
+		for(int k=0;k<outW;k++){
+			if(tmpOutImage[rgb][i][k]>255.0)
+				outImage[rgb][i][k]=255;
+			else if(tmpOutImage[rgb][i][k]<0.0)
+				outImage[rgb][i][k]=0;
+			else
+				outImage[rgb][i][k]=(int)tmpOutImage[rgb][i][k];
+		}
+}
+
+public void sharp(){
+	outH = inH;
+	outW = inW;
+	outImage = new int[3][outH][outW];
+
+	double [][]mask = {
+			{0.0,-1.0,0.0},
+			{-1.0,5.0,-1.0},
+			{0.0,-1.0,0.0}
+			};
+
+	double [][][]tmpInImage = new double[3][outH+2][outW+2];
+
+	int [][][] tmpOutImage = new int[3][outH][outW];
+
+	for(int rgb=0;rgb<3;rgb++){
+	for(int i=0;i<inH+2;i++){
+		for(int k=0;k<inW+2;k++){
+			tmpInImage[rgb][i][k]=127.0;
+		}}
+	}
+	for(int rgb=0;rgb<3;rgb++){
+	for(int i=0;i<inH;i++){
+		for(int k=0;k<inW;k++){
+			tmpInImage[rgb][i+1][k+1]=inImage[rgb][i][k];
+		}
+	}}
+
+
+	//** Image Processing Algorithm **
+	for(int rgb=0;rgb<3;rgb++){
+	for(int i=0;i<inH;i++){
+		for(int k=0;k<inW;k++){
+			double S = 0.0;
+			for(int m=0;m<3;m++)
+				for(int n=0;n<3;n++)
+					S+=tmpInImage[rgb][i+m][k+n]*mask[m][n];
+			tmpOutImage[rgb][i][k]=(int)S;
+		}
+	}}
+	//sum=1
+// 	for(int rgb=0;rgb<3;rgb++)
+// 	for(int i=0;i<outH;i++)
+// 		for(int k=0;k<outW;k++)
+// 			tmpOutImage[rgb][i][k]+=127.0;
+	for(int rgb=0;rgb<3;rgb++)
+	for(int i=0;i<outH;i++)
+		for(int k=0;k<outW;k++){
+			if(tmpOutImage[rgb][i][k]>255.0)
+				outImage[rgb][i][k]=255;
+			else if(tmpOutImage[rgb][i][k]<0.0)
+				outImage[rgb][i][k]=0;
+			else
+				outImage[rgb][i][k]=(int)tmpOutImage[rgb][i][k];
+		}
+}
+
+public void HIsharp(){
+	outH = inH;
+	outW = inW;
+	outImage = new int[3][outH][outW];
+
+	double [][]mask = {
+			{-1.0/9,-1.0/9,-1.0/9},
+			{-1.0/9,8.0/9,-1.0/9},
+			{-1.0/9,-1.0/9,-1.0/9}
+			};
+
+	double [][][]tmpInImage = new double[3][outH+2][outW+2];
+
+	int [][][] tmpOutImage = new int[3][outH][outW];
+
+	for(int rgb=0;rgb<3;rgb++){
+	for(int i=0;i<inH+2;i++){
+		for(int k=0;k<inW+2;k++){
+			tmpInImage[rgb][i][k]=127.0;
+		}}
+	}
+	for(int rgb=0;rgb<3;rgb++){
+	for(int i=0;i<inH;i++){
+		for(int k=0;k<inW;k++){
+			tmpInImage[rgb][i+1][k+1]=inImage[rgb][i][k];
+		}
+	}}
+
+
+	//** Image Processing Algorithm **
+	for(int rgb=0;rgb<3;rgb++){
+	for(int i=0;i<inH;i++){
+		for(int k=0;k<inW;k++){
+			double S = 0.0;
+			for(int m=0;m<3;m++)
+				for(int n=0;n<3;n++)
+					S+=tmpInImage[rgb][i+m][k+n]*mask[m][n];
+			tmpOutImage[rgb][i][k]=(int)S;
+		}
+	}}
+	//sum=1
+	for(int rgb=0;rgb<3;rgb++)
+	for(int i=0;i<outH;i++)
+		for(int k=0;k<outW;k++)
+			tmpOutImage[rgb][i][k]+=127.0;
+	for(int rgb=0;rgb<3;rgb++)
+	for(int i=0;i<outH;i++)
+		for(int k=0;k<outW;k++){
+			if(tmpOutImage[rgb][i][k]>255.0)
+				outImage[rgb][i][k]=255;
+			else if(tmpOutImage[rgb][i][k]<0.0)
+				outImage[rgb][i][k]=0;
+			else
+				outImage[rgb][i][k]=(int)tmpOutImage[rgb][i][k];
+		}
+}
+
+public void edgeImage(){
+	outH = inH;
+	outW = inW;
+	outImage = new int[3][outH][outW];
+
+	double [][]mask = {
+			{0.0,-1.0,0.0},
+			{-1.0,2.0,0.0},
+			{0.0,0.0,0.0}
+			};
+
+	double [][][]tmpInImage = new double[3][outH+2][outW+2];
+
+	int [][][] tmpOutImage = new int[3][outH][outW];
+
+	for(int rgb=0;rgb<3;rgb++){
+	for(int i=0;i<inH+2;i++){
+		for(int k=0;k<inW+2;k++){
+			tmpInImage[rgb][i][k]=127.0;
+		}}
+	}
+	for(int rgb=0;rgb<3;rgb++){
+	for(int i=0;i<inH;i++){
+		for(int k=0;k<inW;k++){
+			tmpInImage[rgb][i+1][k+1]=inImage[rgb][i][k];
+		}
+	}}
+
+
+	//** Image Processing Algorithm **
+	for(int rgb=0;rgb<3;rgb++){
+	for(int i=0;i<inH;i++){
+		for(int k=0;k<inW;k++){
+			double S = 0.0;
+			for(int m=0;m<3;m++)
+				for(int n=0;n<3;n++)
+					S+=tmpInImage[rgb][i+m][k+n]*mask[m][n];
+			tmpOutImage[rgb][i][k]=(int)S;
+		}
+	}}
+	//sum=1
+	for(int rgb=0;rgb<3;rgb++)
+	for(int i=0;i<outH;i++)
+		for(int k=0;k<outW;k++)
+			tmpOutImage[rgb][i][k]+=127.0;
+	for(int rgb=0;rgb<3;rgb++)
+	for(int i=0;i<outH;i++)
+		for(int k=0;k<outW;k++){
+			if(tmpOutImage[rgb][i][k]>255.0)
+				outImage[rgb][i][k]=255;
+			else if(tmpOutImage[rgb][i][k]<0.0)
+				outImage[rgb][i][k]=0;
+			else
+				outImage[rgb][i][k]=(int)tmpOutImage[rgb][i][k];
+		}
+}
+
+public void homogenImage(){
+	outH = inH;
+	outW = inW;
+	outImage = new int[3][outH][outW];
+
+	double [][][]tmpInImage = new double[3][outH+2][outW+2];
+
+	int [][][] tmpOutImage = new int[3][outH][outW];
+
+	for(int rgb=0;rgb<3;rgb++){
+	for(int i=0;i<inH+2;i++){
+		for(int k=0;k<inW+2;k++){
+			tmpInImage[rgb][i][k]=127.0;
+		}}
+	}
+	for(int rgb=0;rgb<3;rgb++){
+	for(int i=0;i<inH;i++){
+		for(int k=0;k<inW;k++){
+			tmpInImage[rgb][i+1][k+1]=inImage[rgb][i][k];
+		}
+	}}
+
+
+	//** Image Processing Algorithm **
+	for(int rgb=0;rgb<3;rgb++){
+	for(int i=0;i<inH;i++){
+		for(int k=0;k<inW;k++){
+			double max = 0.0;
+			for(int m=0;m<3;m++)
+				for(int n=0;n<3;n++)
+					if(Math.abs(tmpInImage[rgb][i+1][k+1]-tmpInImage[rgb][i+m][k+n])>=max)
+						max =Math.abs(tmpInImage[rgb][i+1][k+1]-tmpInImage[rgb][i+m][k+n]);
+			tmpOutImage[rgb][i][k]=(int)max;
+		}
+	}}
+	//sum=1
+// 	for(int rgb=0;rgb<3;rgb++)
+// 	for(int i=0;i<outH;i++)
+// 		for(int k=0;k<outW;k++)
+// 			tmpOutImage[rgb][i][k]+=127.0;
+	for(int rgb=0;rgb<3;rgb++)
+	for(int i=0;i<outH;i++)
+		for(int k=0;k<outW;k++){
+			if(tmpOutImage[rgb][i][k]>255.0)
+				outImage[rgb][i][k]=255;
+			else if(tmpOutImage[rgb][i][k]<0.0)
+				outImage[rgb][i][k]=0;
+			else
+				outImage[rgb][i][k]=(int)tmpOutImage[rgb][i][k];
+		}
+}
+
+public void LOGImage(){
+	outH = inH;
+	outW = inW;
+	outImage = new int[3][outH][outW];
+
+	double [][]mask = {
+			{0.0,0.0,-1.0,0.0,0.0},
+			{0.0,-1.0,-2.0,-1.0,0.0},
+			{-1.0,-2.0,16.0,-2.0,-1.0},
+			{0.0,-1.0,-2.0,-1.0,0.0},
+			{0.0,0.0,-1.0,0.0,0.0}
+			};
+
+	double [][][]tmpInImage = new double[3][outH+4][outW+4];
+
+	int [][][] tmpOutImage = new int[3][outH][outW];
+
+	for(int rgb=0;rgb<3;rgb++){
+	for(int i=0;i<inH+4;i++){
+		for(int k=0;k<inW+4;k++){
+			tmpInImage[rgb][i][k]=127.0;
+		}}
+	}
+	for(int rgb=0;rgb<3;rgb++){
+	for(int i=0;i<inH;i++){
+		for(int k=0;k<inW;k++){
+			tmpInImage[rgb][i+2][k+2]=inImage[rgb][i][k];
+		}
+	}}
+
+
+	//** Image Processing Algorithm **
+	for(int rgb=0;rgb<3;rgb++){
+	for(int i=0;i<inH;i++){
+		for(int k=0;k<inW;k++){
+			double S = 0.0;
+			for(int m=0;m<3;m++)
+				for(int n=0;n<3;n++)
+					S+=tmpInImage[rgb][i+m][k+n]*mask[m][n];
+			tmpOutImage[rgb][i][k]=(int)S;
+		}
+	}}
+	//sum=1
+	for(int rgb=0;rgb<3;rgb++)
+	for(int i=0;i<outH;i++)
+		for(int k=0;k<outW;k++)
+			tmpOutImage[rgb][i][k]+=127.0;
+	for(int rgb=0;rgb<3;rgb++)
+	for(int i=0;i<outH;i++)
+		for(int k=0;k<outW;k++){
+			if(tmpOutImage[rgb][i][k]>255.0)
+				outImage[rgb][i][k]=255;
+			else if(tmpOutImage[rgb][i][k]<0.0)
+				outImage[rgb][i][k]=0;
+			else
+				outImage[rgb][i][k]=(int)tmpOutImage[rgb][i][k];
+		}
+}
+
+public void strechImage(){
+	//스트레칭
+	outH = inH;
+	outW = inW;
+	outImage = new int[3][outH][outW];
+	//** Image Processing Algorithm **
+	int LOW = inImage[0][0][0],HIGH=inImage[0][0][0];
+	for(int rgb=0;rgb<3;rgb++)
+	for(int i=0;i<inH;i++)
+		for(int k=0;k<inW;k++){
+			if(LOW>inImage[rgb][i][k])
+				LOW = inImage[rgb][i][k];
+			if(HIGH<inImage[rgb][i][k])
+				HIGH=inImage[rgb][i][k];
+		}
+	for(int rgb=0;rgb<3;rgb++){
+	for(int i=0;i<inH;i++){
+		for(int k=0;k<inW;k++){
+			double outa = (double)((inImage[rgb][i][k]-LOW)*255/(HIGH-LOW));
+			if(outa<0.0)
+				outa=0;
+			else if(outa>255.0)
+				outa=255;
+			else
+				outa=(int)outa;
+			outImage[rgb][i][k] = (int)outa;
+		}
+	}}
+}
+public void endInImage(){
+	//엔드-인
+	outH = inH;
+	outW = inW;
+	outImage = new int[3][outH][outW];
+
+	//** Image Processing Algorithm **
+
+	int LOW = inImage[0][0][0],HIGH=inImage[0][0][0];
+	for(int rgb=0;rgb<3;rgb++)
+	for(int i=0;i<inH;i++)
+		for(int k=0;k<inW;k++){
+			if(LOW>inImage[rgb][i][k])
+				LOW = inImage[rgb][i][k];
+			if(HIGH<inImage[rgb][i][k])
+				HIGH=inImage[rgb][i][k];
+		}
+	LOW+=50;
+	HIGH+=50;
+	for(int rgb=0;rgb<3;rgb++){
+	for(int i=0;i<inH;i++){
+		for(int k=0;k<inW;k++){
+			double outa = (double)((inImage[rgb][i][k]-LOW)*255/(HIGH-LOW));
+			if(outa<0.0)
+				outa=0;
+			else if(outa>255.0)
+				outa=255;
+			else
+				outa=(int)outa;
+			outImage[rgb][i][k] = (int)outa;
+		}
+	}
+}}
+
+public void equalizeImage(){
+	//평활화
+	outH=inH;
+	outW=inW;
+
+	outImage = new int[3][outH][outW];
+	int histoR[] = new int[256];
+	int histoG[] = new int[256];
+	int histoB[] = new int[256];
+	for(int i=0;i<256;i++){
+	histoR[i] = 0;
+	histoG[i] = 0;
+	histoB[i] = 0;}
+	
+	for(int i=0;i<inH;i++){
+		for(int k=0;k<inW;k++){
+			histoR[inImage[0][i][k]]++;
+			histoG[inImage[1][i][k]]++;
+			histoB[inImage[2][i][k]]++;}}
+
+	int sumHistoR[] = new int[256];
+	int sumHistoG[] = new int[256];
+	int sumHistoB[] = new int[256];
+	for(int i=0;i<256;i++){
+		sumHistoR[i]=0;
+		sumHistoG[i]=0;
+		sumHistoB[i]=0;}
+
+	int sumValueR=0;
+	int sumValueG=0;
+	int sumValueB=0;
+
+	for(int i=0;i<256;i++){
+		sumValueR += histoR[i];
+		sumHistoR[i]=sumValueR;
+		
+		sumValueG += histoG[i];
+		sumHistoG[i]=sumValueG;
+		
+		sumValueB += histoB[i];
+		sumHistoB[i]=sumValueB;
+	}
+
+	double normalHistoR[] = new double[256];
+	double normalHistoG[] = new double[256];
+	double normalHistoB[] = new double[256];
+	
+	for(int i=0;i<256;i++){
+		normalHistoR[i]=0.0;
+		normalHistoG[i]=0.0;
+		normalHistoB[i]=0.0;
+	}
+
+	for(int i=0;i<256;i++){
+		double normalR = sumHistoR[i]*(1.0/(inH*inW))*255.0;
+		normalHistoR[i] = normalR;
+		double normalG = sumHistoG[i]*(1.0/(inH*inW))*255.0;
+		normalHistoG[i] = normalG;
+		double normalB = sumHistoB[i]*(1.0/(inH*inW))*255.0;
+		normalHistoB[i] = normalB;
+		
+	}
+
+	for(int i=0;i<inH;i++){
+		for(int k=0;k<inW;k++){
+			outImage[0][i][k]=(int)normalHistoR[inImage[0][i][k]];
+			outImage[1][i][k]=(int)normalHistoG[inImage[1][i][k]];
+			outImage[2][i][k]=(int)normalHistoB[inImage[2][i][k]];
+		}
+}
+	
+}
+
+
+public float[] rgb2hsv(float r, float g, float b) {
+
+	
+	float max1 = Math.max(r,g);
+	float max2 = Math.max(g,b);
+	float max = Math.max(max1,max2);
+	
+	float min1 = Math.min(r,g);
+	float min2 = Math.min(g,b);
+	float min = Math.min(min1, min2);
+	
+	float d = max - min; //Delta RGB value
+ 
+	float h=0, s;
+	float v = max / 255;
+	
+	if (max==0)
+		 s = 0;
+	else
+		 s = d/max;
+	   
+	
+	if(max==min){
+		h = 0;
+		}
+
+	else if(max==r){
+		h = (g - b) + d * (g < b ? 6: 0); h /= 6 * d;
+	}
+	else if(max==g){
+		h = (b - r) + d * 2; h /= 6 * d;
+	}
+	else{
+		h = (r - g) + d * 4; h /= 6 * d;
+	}
+	
+								 
+	hsv[0] = (float)(h);
+	hsv[1] = (float)(s);
+	hsv[2] = (float)(v);
+	
+	return hsv;
+	}
+
+
+public float[] hsv2rgb(float h, float s, float v)
+{
+	float r=0, g=0, b=0, f, p, q, t;
+	 
+	 h=h*360; s=s*100; v=v*100;
+	 
+     h = Math.max(0, Math.min(360, h));
+     s = Math.max(0, Math.min(100, s));
+     v = Math.max(0, Math.min(100, v));
+        
+     	
+     h /= 360;   s /= 100;     v /= 100;
+
+     int i = (int) Math.floor(h * 6);
+     f = h * 6 - i;
+     p = v * (1 - s);
+     q = v * (1 - f * s);
+     t = v * (1 - (1 - f) * s);
+          
+
+     if(i%6==0){
+    	 r = v; g = t; b = p;
+     }     
+     else if(i%6==1){
+    	 r = q; g = v; b = p;
+     }
+     else if(i%6==2){
+    	 r = p; g = v; b = t;
+     }
+     else if(i%6==3){
+    	 r = p; g = q; b = v;
+     }
+     else if(i%6==4){
+    	 r = t; g = p; b = v;
+     }
+     else if(i%6==5){
+    	 r = v; g = p; b = q;
+     }
+     
+     System.out.println("r"+r);
+   	System.out.println("g"+g);
+   	System.out.println("b"+b);
+
+    
+  	rgb[0] = (float) r*255;
+  	rgb[1] = (float) g*255;
+  	rgb[2] = (float) b*255;
+  	
+  	 System.out.println("r[0]"+rgb[0]);
+   	System.out.println("g[1]"+rgb[1]);
+   	System.out.println("b[2]"+rgb[2]);
+
+	
+    return rgb;
+}
+
+public void saturImage() { // 채도 변경 알고리즘
+    // (중요!) 출력 이미지의 크기가 결정 ---> 알고리즘에 의존...
+    outH = inH;
+    outW = inW;
+
+    // 출력 영상의 3차원 메모리 할당
+   	outImage = new int[3][inH][inW];
+    
+    // **** 진짜 영상처리 알고리즘 *****
+	float s_value = Float.parseFloat(para1);
+ 
+System.out.println("ddd" + inImage[0][22][22]);
+
+        for (int i=0; i<inH; i++) {
+            for (int k=0; k<inW; k++) {
+                float R = inImage[0][i][k];
+                float G = inImage[1][i][k];
+                float B = inImage[2][i][k];
+
+                // RGB --> HSV
+                //rgb2hsv(R,G,B);  // {h : 0~360, s : 0 ~ 1.0, v : 0 ~ 1.0}
+               // int HSV[];
+               		//System.out.println("R"+R);
+
+                
+                abc = rgb2hsv(R,G,B);
+                
+                float H = abc[0];
+                float S = abc[1];
+                float V = abc[2];
+           	
+                
+                // 채도를 변경하자
+                S = S + s_value;
+                
+                // HSV --> RGB
+                
+                		
+                def = hsv2rgb(H,S,V);
+				int R1 = (int) def[0]; 
+				int G1 = (int) def[1];
+				int B1 = (int) def[2];
+
+                // 출력 영상에 넣기
+                outImage[0][i][k] = R1;
+                outImage[1][i][k] = G1;
+                outImage[2][i][k] = B1;
+            }
+        }            
+    // ******************************
+}
+
+%>
+<%
+///////////////////////
+// 메인 코드부
+///////////////////////
+// (0) 파라미터 넘겨 받기
+MultipartRequest multi = new MultipartRequest(request, "C:/Upload", 
+		5*1024*1024, "utf-8", new DefaultFileRenamePolicy());
+
+String tmp;
+Enumeration<?> params = multi.getParameterNames(); //주의! 파라미터 순서가 반대
+tmp = (String) params.nextElement();
+para1 = multi.getParameter(tmp);
+tmp = (String) params.nextElement();
+algo = multi.getParameter(tmp);
+// File
+Enumeration<?> files = multi.getFileNames(); // 여러개 파일
+tmp = (String) files.nextElement(); // 첫 파일 한개
+String filename = multi.getFilesystemName(tmp);// 파일명을 추출
+
+
+// (1)입력 영상 파일 처리
+inFp = new File("c:/Upload/"+filename);
+BufferedImage bImage = ImageIO.read(inFp);
+
+// (2) 파일 --> 메모리
+// (중요!) 입력 영상의 폭과 높이를 알아내야 함!
+inW = bImage.getHeight();
+inH = bImage.getWidth();
+// 메모리 할당
+inImage = new int[3][inH][inW];
+
+// 읽어오기
+for(int i=0; i<inH; i++) {
+	for (int k=0; k<inW; k++) {
+		int rgb = bImage.getRGB(i,k);  // F377D6 
+		int r = (rgb >> 16) & 0xFF; // >>2Byte --->0000F3 & 0000FF --> F3
+		int g = (rgb >> 8) & 0xFF; // >>1Byte --->00F377 & 0000FF --> 77			
+		int b = (rgb >> 0) & 0xFF; // >>0Byte --->F377D6 & 0000FF --> D6
+		inImage[0][i][k] = r;
+		inImage[1][i][k] = g;
+		inImage[2][i][k] = b;
+	}
+}
+
+
+// Image Processing
+switch (algo) {
+	case "101" :
+		reverseImage(); break;
+	case "102" :
+		addImage(); break;
+	case "103" :
+		BWImage127(); break;
+	case "104" :
+		GrayImage();break;
+	case "105" :
+		paracap();break;
+	case "106" :
+		paracup();break;
+	case "107" :
+		TBmirror();break;
+	case "108" :
+		LRmirror();break;
+	case "109" :
+		gammaImage();break;
+	case "110" :
+		moveImage();break;
+	case "111" :
+		zoominImage();break;
+	case "112" :
+		zoomoutImage();break;
+	case "113" :
+		rotateImage();break;
+	case "114" :
+		embossImage();break;
+	case "115" :
+		blurr();break;
+	case "116" :
+		sharp();break;
+	case "117" :
+		edgeImage();break;
+	case "118" : 
+		homogenImage();break;
+	case "119" :
+		LOGImage();break;
+	case "120" :
+		strechImage();break;
+	case "121" :
+		endInImage();break;
+	case "122" :
+		equalizeImage();break;
+	case "123" :
+		saturImage();break;
+		
+		
+}
+
+//(4) 결과를 파일로 저장하기
+outFp = new File("c:/out/out_"+filename);
+BufferedImage oImage 
+	= new BufferedImage(outH, outW, BufferedImage.TYPE_INT_RGB); // Empty Image
+//Memory --> File
+for (int i=0; i<outH; i++) {
+	for (int k=0; k<outW; k++) {
+		int r = outImage[0][i][k];  // F3
+		int g = outImage[1][i][k];  // 77
+		int b = outImage[2][i][k];  // D6
+		int px = 0;
+		px = px | (r << 16);  // 000000 | (F30000) --> F30000
+		px = px | (g << 8);   // F30000 | (007700) --> F37700
+		px = px | (b << 0);   // F37700 | (0000D6) --> F377D6
+		oImage.setRGB(i,k,px);
+	}
+}
+ImageIO.write(oImage, "jpg", outFp);
+
+
+out.println("<h1>" + filename + " 영상 처리 완료 !! </h1>");
+String url="<p><h2><a href='http://192.168.56.101:8080/";
+url += "GrayImageProcessing/download.jsp?file="; 
+url += "out_" + filename + "'> !! 다운로드 !! </a></h2>";
+
+out.println(url);
+
+
+%>
+</body>
+</html>
